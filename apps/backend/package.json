@@ -15,6 +15,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.17.1",
   "dependencies": {
+    "@prisma/client": "6.16.2",
     "express": "^5.1.0"
   },
   "devDependencies": {
@@ -23,6 +24,7 @@
     "@types/node": "^20.19.17",
     "eslint": "^9.36.0",
     "nodemon": "^3.1.10",
+    "prisma": "^6.16.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.44.1"
