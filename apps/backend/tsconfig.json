@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // modern JS output
+    "module": "ESNext", // ES modules
+    "moduleResolution": "Node",
+    "outDir": "dist", // compiled JS goes here
+    "rootDir": "src", // TypeScript source folder
+    "strict": true, // full type safety
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true // skip type checks on dependencies
+  },
+  "include": ["src"]
+}
