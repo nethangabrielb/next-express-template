@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2020", // modern JS output
-    "module": "ESNext", // ES modules
-    "moduleResolution": "Node",
-    "outDir": "dist", // compiled JS goes here
-    "rootDir": "src", // TypeScript source folder
-    "strict": true, // full type safety
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true // skip type checks on dependencies
+    "skipLibCheck": true
   },
   "include": ["src"]
+  // Remove the "ts-node" section - not needed with tsx
 }
