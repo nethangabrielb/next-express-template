@@ -1,14 +1,15 @@
-import express from "express";
-import cors from "cors";
+import express from 'express';
 
-import authRouter from "./routes/guest/authRoutes";
+import cors from 'cors';
+
+import authRouter from './routes/guest/authRoutes';
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
-app.use("/api/guest", authRouter);
+app.use('/api/guest', authRouter);
 
 const PORT = process.env.PORT || 5000;
 

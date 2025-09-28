@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from "express";
-import { validationResult } from "express-validator";
+import { NextFunction, Request, Response } from 'express';
 
-import type { RegistrationBody } from "../../types/registrationBody";
-import type { ApiResponse } from "../../types/apiResponse";
+import { validationResult } from 'express-validator';
 
-import email from "../rules/email";
-import password from "../rules/password";
-import confirmPassword from "../rules/confirmPassword";
+import type { ApiResponse } from '../../types/apiResponse';
+import type { RegistrationBody } from '../../types/registrationBody';
+import confirmPassword from '../rules/confirmPassword';
+import email from '../rules/email';
+import password from '../rules/password';
 
 const registrationValidation = [email, password, confirmPassword];
 
@@ -20,16 +20,13 @@ const validateRegistration = [
     // Retrieve errors from express-validator on input fields
     const errors = validationResult(req);
 
-    console.log(errors);
-    console.log(req.body);
-
     // Return errors if there are any
     if (!errors.isEmpty()) {
       const errorsArr = errors.array({ onlyFirstError: true });
       return res.json({
-        status: "success",
-        data: errorsArr.map((err) => err.msg),
-        message: "Error validating form input",
+        status: 'success',
+        data: errorsArr.map(err => err.msg),
+        message: 'Error validating form input',
       } as ApiResponse<string[]>);
     } else {
       next();
