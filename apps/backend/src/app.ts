@@ -1,10 +1,14 @@
 import express from "express";
+import cors from "cors";
+
+import authRouter from "./routes/guest/authRoutes";
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.use(express.json());
+app.use(cors());
+
+app.use("/api/guest", authRouter);
 
 const PORT = process.env.PORT || 5000;
 
