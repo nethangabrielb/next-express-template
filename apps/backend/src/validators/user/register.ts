@@ -6,9 +6,17 @@ import type { ApiResponse } from '../../types/apiResponse';
 import type { RegistrationBody } from '../../types/registrationBody';
 import confirmPassword from '../rules/confirmPassword';
 import email from '../rules/email';
+import name from '../rules/name';
 import password from '../rules/password';
+import username from '../rules/username';
 
-const registrationValidation = [email, password, confirmPassword];
+const registrationValidation = [
+  name,
+  username,
+  email,
+  password,
+  confirmPassword,
+];
 
 const validateRegistration = [
   ...registrationValidation,
