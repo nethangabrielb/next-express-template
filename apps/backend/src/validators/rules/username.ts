@@ -9,12 +9,12 @@ export default body('username')
   .notEmpty()
   .withMessage("Username can't be empty.")
   .custom(async value => {
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findUnique({
       where: {
         username: value,
       },
     });
-    if (!user) return true;
-    return value !== user.username;
-  })
-  .withMessage('Username already exists.');
+    if (user?.username === value) {
+      throw new Error('Username is already taken.');
+    }
+  });

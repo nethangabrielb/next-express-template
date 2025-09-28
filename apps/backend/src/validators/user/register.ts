@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 
 import { validationResult } from 'express-validator';
 
-import type { ApiResponse } from '../../types/apiResponse';
 import type { RegistrationBody } from '../../types/registrationBody';
 import confirmPassword from '../rules/confirmPassword';
 import email from '../rules/email';
@@ -35,7 +34,7 @@ const validateRegistration = [
         status: 'success',
         data: errorsArr.map(err => err.msg),
         message: 'Error validating form input',
-      } as ApiResponse<string[]>);
+      });
     } else {
       next();
     }

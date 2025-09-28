@@ -16,7 +16,7 @@ export default body('email')
         email: value,
       },
     });
-    if (!user) return true;
-    return value !== user.email;
-  })
-  .withMessage('Email already in use.');
+    if (user?.email === value) {
+      throw new Error('Email is already taken.');
+    }
+  });
