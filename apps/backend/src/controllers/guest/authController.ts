@@ -9,7 +9,7 @@ const authController = (() => {
     res: Response
   ) => {
     try {
-      const newUser = UserService.createNewUser(req.body);
+      const newUser = await UserService.createNewUser(req.body);
 
       res.json({
         status: 'success',

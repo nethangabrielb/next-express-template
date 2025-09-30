@@ -36,6 +36,7 @@ const validateRegistration = [
         message: 'Error validating form input',
       });
     } else {
+      delete req.body.confirmPassword;
       next();
     }
   },
