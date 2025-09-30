@@ -39,6 +39,26 @@ const UserService = {
     // return token
     return token;
   },
+  getUserById: async (id: number) => {
+    const user = await UserRepository.findById(id);
+    if (!user) throw new Error('User not found');
+    return user;
+  },
+
+  getAllUsers: async () => {
+    return UserRepository.findAll();
+  },
+
+  updateUser: async (id: number, data: Partial<RegistrationBody>) => {
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, 10);
+    }
+    return UserRepository.updateById(id, data);
+  },
+
+  deleteUser: async (id: number) => {
+    return UserRepository.deleteById(id);
+  },
 };
 
 export default UserService;
