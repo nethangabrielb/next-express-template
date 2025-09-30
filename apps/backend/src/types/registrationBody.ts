@@ -3,7 +3,7 @@ interface RegistrationBody {
   username: string;
   email: string;
   password: string;
-  confirmPassword: string;
+  confirmPassword?: string;
 }
 
 export type { RegistrationBody };
