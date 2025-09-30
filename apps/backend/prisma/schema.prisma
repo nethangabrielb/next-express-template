@@ -22,3 +22,12 @@ model User {
   password String
   avatar   String?
 }
+
+model FederatedCredentials {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  provider String
+  subject  String
+
+  @@unique([provider, subject])
+}
