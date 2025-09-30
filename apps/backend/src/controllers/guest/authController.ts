@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 
-import bcrypt from 'bcryptjs';
-
-import { prisma } from '../../lib/prisma';
+import UserService from '../../services/userService';
 import type { RegistrationBody } from '../../types/registrationBody';
 
 const authController = (() => {
@@ -11,30 +9,25 @@ const authController = (() => {
     res: Response
   ) => {
     try {
-      const { name, username, email, password } = req.body;
-
-      const encryptedPassword = await bcrypt.hash(password, 10);
-
-      const newUser = await prisma.user.create({
-        data: {
-          name,
-          username,
-          email,
-          password: encryptedPassword,
-        },
-      });
+      const newUser = UserService.createNewUser(req.body);
 
       res.json({
         status: 'success',
         message: 'User created successfully!',
         data: newUser,
       });
-    } catch (err) {
-      res.json({
-        status: 'error',
-        message: 'An error occured in the server. Please try again.',
-        data: err,
-      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        res.json({
+          status: 'error',
+          message: err.message,
+        });
+      } else {
+        res.json({
+          status: 'error',
+          message: 'An unknown error occurred',
+        });
+      }
     }
   };
 
