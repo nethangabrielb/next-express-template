@@ -58,7 +58,9 @@ const authController = (() => {
     }
   };
 
-  return { register, login };
+  const redirect = (req: Request, res: Response) => {};
+
+  return { register, login, redirect };
 })();
 
 export default authController;
