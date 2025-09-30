@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 import UserRepository from '../repositories/userRepository';
-import type { RegistrationBody } from '../types/registrationBody';
+import type { RegistrationBody } from '../types/auth';
 
 const UserService = {
   createNewUser: async (data: RegistrationBody) => {

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import UserService from '../../services/userService';
-import type { RegistrationBody } from '../../types/registrationBody';
+import type { RegistrationBody } from '../../types/auth';
 
 const authController = (() => {
   const register = async (

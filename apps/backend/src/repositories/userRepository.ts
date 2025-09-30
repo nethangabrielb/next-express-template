@@ -1,5 +1,5 @@
 import { prisma } from '../prisma/client';
-import type { RegistrationBody } from '../types/registrationBody';
+import type { RegistrationBody } from '../types/auth';
 
 const UserRepository = {
   createNewUser: (data: RegistrationBody) => prisma.user.create({ data }),

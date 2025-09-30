@@ -6,4 +6,9 @@ interface RegistrationBody {
   confirmPassword?: string;
 }
 
-export type { RegistrationBody };
+interface LoginBody {
+  username: string;
+  password: string;
+}
+
+export type { RegistrationBody, LoginBody };
