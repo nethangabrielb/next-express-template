@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import UserService from '../../services/userService';
 import type { LoginBody, RegistrationBody } from '../../types/auth';
 
+const GENERIC_ERROR_MESSAGE = 'An unknown error occurred';
+
 const authController = (() => {
   const register = async (
     req: Request<object, object, RegistrationBody>,
@@ -17,17 +19,10 @@ const authController = (() => {
         data: newUser,
       });
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        res.json({
-          status: 'error',
-          message: err.message,
-        });
-      } else {
-        res.json({
-          status: 'error',
-          message: 'An unknown error occurred',
-        });
-      }
+      res.json({
+        status: 'error',
+        message: err instanceof Error ? err.message : GENERIC_ERROR_MESSAGE,
+      });
     }
   };
 
@@ -44,17 +39,10 @@ const authController = (() => {
         data: token,
       });
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        res.json({
-          status: 'error',
-          message: err.message,
-        });
-      } else {
-        res.json({
-          status: 'error',
-          message: 'An unknown error occurred',
-        });
-      }
+      res.json({
+        status: 'error',
+        message: err instanceof Error ? err.message : GENERIC_ERROR_MESSAGE,
+      });
     }
   };
 
