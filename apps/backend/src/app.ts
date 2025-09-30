@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
+import '../src/config/passport';
 import authRouter from './routes/guest/authRoutes';
 
 dotenv.config();
