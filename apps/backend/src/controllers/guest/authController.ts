@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import UserService from '../../services/userService';
-import type { RegistrationBody } from '../../types/auth';
+import type { LoginBody, RegistrationBody } from '../../types/auth';
 
 const authController = (() => {
   const register = async (
@@ -31,7 +31,32 @@ const authController = (() => {
     }
   };
 
-  const login = (req: Request, res: Response) => {};
+  const login = async (
+    req: Request<object, object, LoginBody>,
+    res: Response
+  ) => {
+    try {
+      const token = await UserService.loginUser(req.body);
+
+      res.json({
+        status: 'success',
+        message: 'Log in success!',
+        data: token,
+      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        res.json({
+          status: 'error',
+          message: err.message,
+        });
+      } else {
+        res.json({
+          status: 'error',
+          message: 'An unknown error occurred',
+        });
+      }
+    }
+  };
 
   return { register, login };
 })();

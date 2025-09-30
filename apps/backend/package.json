@@ -18,14 +18,17 @@
     "@prisma/client": "6.16.2",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "express-validator": "^7.2.1"
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.19.17",
     "eslint": "^9.36.0",
     "nodemon": "^3.1.10",
