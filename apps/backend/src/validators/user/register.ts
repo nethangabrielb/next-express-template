@@ -2,23 +2,17 @@ import { NextFunction, Request, Response } from 'express';
 
 import { validationResult } from 'express-validator';
 
-import type { RegistrationBody } from '../../types/registrationBody';
+import type { RegistrationBody } from '../../types/auth';
 import confirmPassword from '../rules/confirmPassword';
 import email from '../rules/email';
 import name from '../rules/name';
 import password from '../rules/password';
 import username from '../rules/username';
 
-const registrationValidation = [
-  name,
-  username,
-  email,
-  password,
-  confirmPassword,
-];
+const registrationRules = [name, username, email, password, confirmPassword];
 
 const validateRegistration = [
-  ...registrationValidation,
+  ...registrationRules,
   (
     req: Request<object, object, RegistrationBody>,
     res: Response,
