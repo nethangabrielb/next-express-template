@@ -13,13 +13,13 @@ const authController = (() => {
     try {
       const newUser = await UserService.createNewUser(req.body);
 
-      res.json({
+      res.status(200).json({
         status: 'success',
         message: 'User created successfully!',
         data: newUser,
       });
     } catch (err: unknown) {
-      res.json({
+      res.status(500).json({
         status: 'error',
         message: err instanceof Error ? err.message : GENERIC_ERROR_MESSAGE,
       });
@@ -33,13 +33,13 @@ const authController = (() => {
     try {
       const token = await UserService.loginUser(req.body);
 
-      res.json({
+      res.status(200).json({
         status: 'success',
         message: 'Log in success!',
         data: token,
       });
     } catch (err: unknown) {
-      res.json({
+      res.status(err instanceof Error ? 400 : 500).json({
         status: 'error',
         message: err instanceof Error ? err.message : GENERIC_ERROR_MESSAGE,
       });

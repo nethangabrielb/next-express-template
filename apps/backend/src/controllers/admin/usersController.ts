@@ -9,9 +9,9 @@ const userController = (() => {
   const getUser = async (req: Request<{ id: string }>, res: Response) => {
     try {
       const user = await UserService.getUserById(Number(req.params.id));
-      res.json({ status: 'success', data: user });
+      res.status(200).json({ status: 'success', data: user });
     } catch (err: unknown) {
-      res.json({
+      res.status(err instanceof Error ? 404 : 500).json({
         status: 'error',
         message: err instanceof Error ? err.message : GENERIC_ERROR_MESSAGE,
       });
