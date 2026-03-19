@@ -1,21 +1,23 @@
 # Next.js + Express Monorepo Template
 
-A production-ready monorepo template featuring Next.js 15 frontend and Express backend with TypeScript, Prisma ORM, and authentication.
+A production-ready monorepo template featuring Next.js 16 frontend and Express backend with TypeScript, Prisma ORM, and authentication.
 
 ## 🚀 Features
 
 ### Frontend
-- **Next.js 15** with App Router and Turbopack
-- **React 19** with TypeScript
+- **Next.js 16** with App Router and Turbopack
+- **React 19.2** with TypeScript
 - **Tailwind CSS 4** for styling
-- **shadcn/ui** components
 - **TanStack Query** for data fetching
-- **React Hook Form + Zod** for form validation
+- **Zustand** for global client state management
+- **React Hook Form + Zod + @hookform/resolvers** for form validation
+- **Motion (Framer Motion v12)** for animations
 - **Lucide React** icons
+- **Radix UI** primitives
 
 ### Backend
 - **Express 5** with TypeScript
-- **Prisma ORM** with PostgreSQL
+- **Prisma ORM 7** with PostgreSQL (driver adapter pattern)
 - **JWT Authentication** with bcrypt
 - **Passport.js** with Google OAuth
 - **Express Validator** for request validation
@@ -28,33 +30,37 @@ A production-ready monorepo template featuring Next.js 15 frontend and Express b
 .
 ├── apps/
 │   ├── backend/          # Express API server
+│   │   ├── generated/    # Prisma generated client (source tree)
 │   │   ├── prisma/       # Database schema and migrations
+│   │   │   ├── schema.prisma
+│   │   │   └── migrations/
+│   │   ├── prisma.config.ts  # Prisma 7 config (datasource, migrations)
 │   │   └── src/
-│   │       ├── config/   # Configuration files (Passport, etc.)
+│   │       ├── config/       # Configuration files (Passport, etc.)
 │   │       ├── controllers/  # Request handlers
 │   │       ├── middlewares/  # Custom middleware
 │   │       ├── repositories/ # Database access layer
-│   │       ├── routes/   # API routes
-│   │       ├── services/ # Business logic
-│   │       ├── types/    # TypeScript types
-│   │       └── validators/  # Request validation rules
+│   │       ├── routes/       # API routes
+│   │       ├── services/     # Business logic
+│   │       ├── types/        # TypeScript types
+│   │       └── validators/   # Request validation rules
 │   │
 │   └── frontend/         # Next.js application
 │       └── src/
-│           ├── app/      # App Router pages
-│           ├── components/  # React components
-│           ├── lib/      # Utilities
-│           ├── providers/   # Context providers
-│           ├── schemas/  # Zod schemas
-│           └── types/    # TypeScript types
+│           ├── app/          # App Router pages
+│           ├── components/   # React components
+│           ├── lib/          # Utilities
+│           ├── providers/    # Context providers
+│           ├── schemas/      # Zod schemas
+│           └── types/        # TypeScript types
 │
 └── packages/             # Shared packages (if any)
 ```
 
 ## 🛠️ Prerequisites
 
-- **Node.js** 20+ 
-- **pnpm** 10.17.1+
+- **Node.js** 24+ (LTS)
+- **pnpm** 10.32+
 - **PostgreSQL** database
 
 ## 🚀 Getting Started
@@ -62,17 +68,20 @@ A production-ready monorepo template featuring Next.js 15 frontend and Express b
 ### 1. Clone and Install
 
 ```bash
-# Clone the repository
 git clone <your-repo-url>
 cd next-express-template
 
 # Install dependencies
 pnpm install
+
+# Approve required native build scripts
+pnpm approve-builds
+# Approve: sharp, @tailwindcss/oxide, esbuild, prisma, @prisma/client, @prisma/engines, unrs-resolver
 ```
 
 ### 2. Environment Setup
 
-Create an `.env` file in the backend for db and google information:
+Create a `.env` file in the backend:
 
 **Backend (`apps/backend/.env`):**
 ```env
@@ -85,14 +94,13 @@ GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ### 3. Database Setup
 
 ```bash
-# Navigate to backend
 cd apps/backend
 
 # Run migrations
-pnpm prisma migrate dev
+npx prisma migrate deploy
 
-# Generate Prisma Client
-pnpm prisma generate
+# Generate Prisma Client (outputs to /generated)
+npx prisma generate
 ```
 
 ### 4. Run Development Servers
@@ -101,9 +109,9 @@ pnpm prisma generate
 # Run both frontend and backend concurrently
 pnpm dev
 
-# Or run them individually:
-pnpm frontend  # Frontend only (http://localhost:3000)
-pnpm backend   # Backend only (http://localhost:3001)
+# Or run individually:
+pnpm frontend  # http://localhost:3000
+pnpm backend   # http://localhost:3001
 ```
 
 ## 📝 Available Scripts
@@ -114,7 +122,7 @@ pnpm backend   # Backend only (http://localhost:3001)
 - `pnpm backend` - Run backend only
 
 ### Backend (`apps/backend`)
-- `pnpm dev` - Start development server with hot reload
+- `pnpm dev` - Start development server with hot reload (tsx watch)
 - `pnpm typecheck` - Run TypeScript type checking
 - `pnpm lint` - Run ESLint
 
@@ -145,44 +153,108 @@ The backend follows a **layered architecture**:
 
 ## 🗄️ Database
 
-### Prisma Schema
+### Prisma 7 — Driver Adapter Pattern
 
-The project includes:
-- User model with authentication
-- Federated credentials for OAuth
-- Migration history
+Prisma 7 no longer bundles a Rust query engine binary. Instead, it uses a **driver adapter** that connects directly to the `pg` native driver, resulting in faster queries, better connection pooling, and faster cold starts.
 
-To modify the schema:
+**`prisma.config.ts`** (backend root):
+```ts
+import { config } from 'dotenv';
+import { defineConfig, env } from 'prisma/config';
+
+config();
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  migrations: {
+    path: 'prisma/migrations',
+  },
+  datasource: {
+    url: env('DATABASE_URL'),
+  },
+});
+```
+
+**`schema.prisma`** generator block:
+```prisma
+generator client {
+  provider = "prisma-client"
+  output   = "../generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+```
+
+**Prisma Client instantiation** (`src/prisma/client.ts`):
+```ts
+import { config } from 'dotenv';
+config();
+
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../../generated/client';
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+export const prisma = new PrismaClient({ adapter });
+```
+
+> ⚠️ The generated client lives in `/generated` (your source tree), not `node_modules`. Import from `../../generated/client`, not `@prisma/client`.
+
+### Schema Changes
+
 ```bash
 cd apps/backend
-# Edit prisma/schema.prisma
-pnpm prisma migrate dev --name your_migration_name
+
+# Create and apply a new migration
+npx prisma migrate dev --name your_migration_name
+
+# Apply existing migrations (production)
+npx prisma migrate deploy
+
+# Regenerate client after schema changes
+npx prisma generate
 ```
 
 ## 🎨 Frontend Features
 
-- **Modern UI** with shadcn/ui components
-- **Type-safe forms** with React Hook Form + Zod
-- **Optimistic updates** with TanStack Query
-- **Responsive design** with Tailwind CSS
+- **Type-safe forms** with React Hook Form + Zod + @hookform/resolvers
+- **Server state** with TanStack Query (fetching, caching, sync)
+- **Global client state** with Zustand
+- **Animations** with Motion (Framer Motion v12)
+- **Responsive design** with Tailwind CSS 4
 - **Animation utilities** with tw-animate-css
 
 ## 🔧 Tech Stack
 
 | Category | Frontend | Backend |
-|----------|----------|---------|
-| Framework | Next.js 15 | Express 5 |
-| Language | TypeScript | TypeScript |
-| Database | - | Prisma + PostgreSQL |
-| Styling | Tailwind CSS 4 | - |
-| State Management | TanStack Query | - |
-| Authentication | - | JWT + Passport.js |
-| Validation | Zod | Express Validator |
-| Dev Tools | ESLint, Prettier | ESLint, Prettier, Nodemon |
+|---|---|---|
+| Framework | Next.js 16 | Express 5 |
+| Runtime | Node.js 24 LTS | Node.js 24 LTS |
+| Language | TypeScript 5 | TypeScript 5 |
+| Database | — | Prisma 7 + PostgreSQL |
+| DB Driver | — | @prisma/adapter-pg + pg |
+| Styling | Tailwind CSS 4 | — |
+| Server State | TanStack Query v5 | — |
+| Client State | Zustand v5 | — |
+| Animation | Motion v12 | — |
+| Authentication | — | JWT + Passport.js |
+| Forms | React Hook Form v7 + Zod v4 | — |
+| Validation | Zod v4 | Express Validator |
+| Dev Tools | ESLint 9, Prettier | ESLint 9, Prettier, tsx |
+| Package Manager | pnpm 10.32+ | pnpm 10.32+ |
 
-## 📄 License
+## ⚠️ Held Updates (Intentional)
 
-ISC
+These packages have newer major versions available but are held pending ecosystem support:
+
+| Package | Current | Latest | Reason |
+|---|---|---|---|
+| `eslint` | 9 | 10 | `eslint-config-next` not yet compatible |
+| `@eslint/js` | 9 | 10 | Paired with ESLint, update together |
+| `prisma` / `@prisma/client` | 7 | — | Already on latest |
+| `@trivago/prettier-plugin-sort-imports` | 5 | 6 | Breaking config changes, verify before updating |
+| `@types/node` | 24 | 25 | Node 25 is not LTS; stay on 24 |
 
 ## 🤝 Contributing
 
